@@ -21,80 +21,75 @@ type LoginScreenNavigationProp = NativeStackNavigationProp<
 const LoginScreen = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation<LoginScreenNavigationProp>();
 
   const handleLogin = async () => {
-    if (!username.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please enter both username and password');
+    if (!username || !password) {
+      Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
-    setIsLoading(true);
-
+    setLoading(true);
     try {
-      // Simulate API call - replace with your actual authentication logic
+      // Here you would typically make an API call to validate credentials
+      // For demo purposes, we'll just simulate a successful login
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Store user data
+      await AsyncStorage.setItem('userToken', 'dummy-auth-token');
+      await AsyncStorage.setItem('username', username);
 
-      // For demo purposes, accept any non-empty credentials
-      // Replace this with your actual authentication logic
-      if (username.length > 0 && password.length > 0) {
-        // Store auth token
-        await AsyncStorage.setItem('userToken', 'your-auth-token');
-        await AsyncStorage.setItem('username', username);
-        
-        // Navigate to home screen
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Home'}],
-        });
-      } else {
-        Alert.alert('Error', 'Invalid credentials');
-      }
+      // Navigate to Home screen
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Home' }],
+      });
     } catch (error) {
       Alert.alert('Error', 'Login failed. Please try again.');
-      console.log('Login error:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome Back</Text>
-      <Text style={styles.subtitle}>Sign in to continue</Text>
+      <Text style={styles.subtitle}>Please sign in to continue</Text>
 
-      <View style={styles.inputContainer}>
+      <View style={styles.form}>
         <TextInput
           style={styles.input}
           placeholder="Username"
+          placeholderTextColor="#666"
           value={username}
           onChangeText={setUsername}
           autoCapitalize="none"
-          autoCorrect={false}
+          editable={!loading}
         />
-        
+
         <TextInput
           style={styles.input}
           placeholder="Password"
+          placeholderTextColor="#666"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
+          editable={!loading}
         />
-      </View>
 
-      <TouchableOpacity
-        style={[styles.loginButton, isLoading && styles.disabledButton]}
-        onPress={handleLogin}
-        disabled={isLoading}>
-        {isLoading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.loginButtonText}>Login</Text>
-        )}
-      </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.loginButtonText}>Login</Text>
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -103,47 +98,57 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
     color: '#333',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 40,
     color: '#666',
-  },
-  inputContainer: {
     marginBottom: 30,
+    textAlign: 'center',
+  },
+  form: {
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   input: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 15,
-    paddingVertical: 12,
+    backgroundColor: '#f9f9f9',
+    padding: 15,
     borderRadius: 8,
     marginBottom: 15,
     fontSize: 16,
+    color: 'black',
     borderWidth: 1,
     borderColor: '#ddd',
   },
   loginButton: {
     backgroundColor: '#007AFF',
-    paddingVertical: 15,
+    padding: 15,
     borderRadius: 8,
     alignItems: 'center',
   },
-  disabledButton: {
-    opacity: 0.6,
+  loginButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   loginButtonText: {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
 });
