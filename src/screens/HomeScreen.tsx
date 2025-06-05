@@ -70,13 +70,7 @@ const HomeScreen = () => {
       </TouchableOpacity>
     </View>
   );
-const App =()=>{
-  return(
-    <View>
-      <Text>props in react native</Text>
-    </View>
-  )
-}
+
   
 };
 
